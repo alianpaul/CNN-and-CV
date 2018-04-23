@@ -1,0 +1,60 @@
+#+STARTUP: latexpreview
+
+* Nearest Neighbour Classifier
+** How to compare two images?
+
+   Distance Metric.
+
+   L1 Distance(Manhatton distance): $d_1(I_1, I_2) = \sum_p | I_1^p - I_2^p |$
+
+   Training process just memorize the data. Predicting process just go
+   through the data and find the minist L1 distance image.
+
+** How long it takes in the 2 processes?
+
+   Training: $O(1)$
+   Predicting: $O(N)$
+
+   We want a fast predicting process and dont care how long the
+   training process takes.
+
+** Descison region of the nearest neighbour classifier.
+
+   Region has faults.  e.g. Islands or fingers in a region.
+   Improvement: K-nearest Neighbour
+
+** K-nearest Neighbour
+   kNN
+
+   Majority vote from K closest points
+
+   Region can be smoothed through votes.
+
+** L2 distance(Euclidean distance)
+
+   L2 distance(Euclidean distance): $d_2(I_1, I_2) = \sqrt{\sum_p (I_1^p - I_2^p)^2}$
+
+   What is happening if we choose different distance metric?
+
+   L1 depends on the coordinate system we choose.  L2 does not. 
+
+** Hyperparameters
+
+   Parameters not learned from training data.  We set these rather
+   than learn. e.g. K, distance metrics.  These depend on the problem
+   and data.  Try different hyperparameters and see what works best. 
+
+   We separate the data into 3 sets: *Training data*, *Validation data*,
+   *Test data*.  We use validation data to choose the best
+   hyperparameter setting.  At last we use test data to test our
+   model once at the very end.
+
+   *Cross-validation*: useful for small datasets, but not used too
+   frequently in deep learning.
+
+** K-nearest neighbour on images never used
+   - Distance metrics on pixels are not informative.
+   - The curse of Dimensionality.  We want the points in the space to
+     be dense, but the points increase exponentially with the
+     dimension.  We will never cover the full space.
+     

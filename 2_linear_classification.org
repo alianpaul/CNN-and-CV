@@ -1,0 +1,155 @@
+#+STARTUP: latexpreview
+
+* Linear Classifier
+  Most basic building blocks of giant neural networks.
+** Parametric Approach 
+
+   $output score = f(x, W)$, $x$ is the image input
+   and $W$ is the parameters or weights.
+
+   We summarize $x$ into $W$.  When we do tests, we don't need $x$
+   anymore. Much faster.
+
+   The problem is how to design the $f$ ? The easy one: Linear Classifier
+
+** Linear Classifier
+
+   \[score = f(x, W) = W \cdot x + b \]
+
+   e.g. image: 32 * 32 * 3 = 3072, 10 labels to classify.  So $W$ is
+   10 * 3072, $x$ is 3072 * 1, $b$ is 10 * 1.  $b$ is for us to set
+   preference to specific label, it's a data independant scaling.
+
+** A template matching approach
+
+   Linear classifier is a template matching approach.  Each row of $W$
+   matchs a template of the image.  We can interpret the each template
+   by rebuilding the image.  But this method has a restriction that
+   each category has only one template.
+
+   Ping Pong between *the high dimensional vector view* and *image view*.
+
+   From the dimension view, each image is a point in the space and the
+   linear classifier just try to draw a line between different
+   categories of images.  Linear classifier will struggle if we can
+   not separate different categories using a single line.  e.g.
+   even/odd classification, L2 norm classification, multimodal
+   classification(one class appears in different regions of space).
+
+** How to find parameters in $W$ and $b$ and quantify our unhappiness with the scores across the training data?
+
+   We use loss function to quantify our unhappiness.  Loss function
+   tells us how good our classifier is.  The procedure to minimize the
+   loss function is called optimization.
+
+   data set: $\{(x_i, y_{i})\}_{i = 1}^N$, $x_i$ is the image, $y_i$ is the integer label.
+   
+   loss of each image i: $L_i(f(x_i, W), y_i)$
+
+   loss of the whole data set: $L = \frac{1}{N} \sum_i L_i(f(x_i, W), y_i)$
+
+** Multi-class SVM loss
+
+   $s_j$: score of class $j$.
+
+   $s_{y_i}$: score of the image's true class.
+
+   \[L_i = \sum_{j \neq y_i} max(0, s_j - s_{y_i} + 1)\]
+
+   Sum of all the loss over the wrong class.  if $s_j - s_{y_i} + 1
+   \leq 0, s_{y_i} \geq s_j + 1$ , the contibution to the loss of the
+   wrong class is 0.  1 is a safety margin, make $s_{y_i}$ big enough.
+   If $s_{y_i}$ is bigger than other class by some safety margin, then we can get the correct answer.
+
+   - Why choose the safety margin equals 1?
+
+     ???
+
+   - Q1: If we jiggle the 0 contribution class's score $s_j$, what will happen to the loss function?
+     
+     The loss will not change as if we stay in the safety margin.
+
+   - Q2: min/max loss?
+     
+     min: 0, max: $\infty$
+
+   - Q3: If we start at a small $W$ so that all $s \approx 0$, what loss will we get?
+     
+     num of class - 1.  We can use this to debug our learning algorithm.
+
+   - Q4: mean instead of sum?
+
+     Just rescale.
+
+   - Q5: quadratic instead of linear ($max(0, s_j - s_{y_i} + 1)^2$)?
+
+     Which to choose depends on how much we quantify the errors.  It
+     depends on application.
+
+   - Q6: Is 0 loss $W$ unique?
+
+     No, $nW$ is also 0 loss.
+** Regularization
+   
+   \[L = \frac{1}{N} \sum_i L_i(f(x_i, W), y_i) + \lambda R(W)\]
+   
+   We can find a $W$ that perfectly fits the training data, but what
+   we really care is the performace of $W$ on test data.  We want $W$
+   to be more generalized, not to specific.  So we add a
+   regularization penalty $\lambda R(W)$, $\lambda$ is the
+   regularization strength.  
+
+   Occam's Razer: Among competing hypotheses, the simplest is the
+   best.
+
+   L2 regularization: Euclidean norm of weight vector $W$.
+
+   L1 regularization: Encourage sparsity of the $W$.
+
+   Elastic regularization: L1 + L2
+
+   Max norm regularization:
+
+   Regularization specific to deep learning: Dropout, Batch
+   normalization, Stochastic depth.
+
+   The key idea of regularization is to penalize the complexity of
+   model.
+
+   e.g. L1: more sparse more simple, L2: more spread more simple.
+
+** (Softmax classifier) Multinomial logistic regression
+
+   In Multi-class SVM loss, we just want the true class's score to be
+   the biggest among all scores.  Except that we can't get much
+   information.
+
+   In softmax loss, we use these scores to compute a probability
+   distribution over our classes.
+
+   \[P(Y = k | X = x_i) = \frac{e^{s_k}}{ \sum_j e^{s_j} }\]
+   
+   \[s = f(x_i, W)\]
+
+   Target probability distribution: true class probability mass = 1,
+   other = 0.  We want our computed probability distribution(computed
+   by softmax function) to match the target probability distribution
+   that has all the mass on the correct class.
+
+   We want to make $P(Y = y_i | X = x_i)$ as big as
+   possible(approximates 1).  $log$ is more convient to compute.
+   Instead of computing raw probability, we compute to maximize
+   $log(P(Y = y_i | X = x_i))$.  But by the convention of loss
+   function, we usually minimize the loss.  So the loss function
+   should be $L_i = -log(P(Y = y_i | X = x_i))$.
+
+   \[ L_i = -log(\frac{e^{s_{y_i}}}{\sum_j e^{s_j}}) \]
+
+   - Q1: min/max
+     
+     ???
+
+   - Q2: When we debug(All the $s \approx 0$), $L_i=$?
+
+     ???
+     

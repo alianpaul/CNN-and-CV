@@ -1,0 +1,55 @@
+#+STARTUP: latexpreview
+
+* Optimization
+
+  Slope: 1-dimensional derivative.
+
+  Gradient: a vector of partial derivatives along each dimension.
+
+  Great property of gradient: it points to the direction of greatest
+  increase of the function.  - gradient points to the greatest
+  decrease of the function.  Slope of any direction = gradient * unit
+  vector of that direction.
+
+  Gradient gives us linear first order approximation.
+
+** How to compute the gradient at a point?
+
+    Naively, for each element(direction) of gradient, we increase a
+    little bit and get the function increase.  We do this for each
+    direction and get the gradient vector.  This is the *numeric gradient*.
+    We may also use *analytic gradient* by getting the precise expression.
+
+** Gradient check
+
+    In practice, we usually use analytic gradient, and use numeric gradient as a
+    unit test to debug our analytic gradient result.
+
+  #+BEGIN_SRC python
+      while True:
+          weights_grads = evaluate_gradients(loss_function, data, weights)
+          weights += - step_size * weight_grads
+  #+END_SRC
+
+  learning rate(step size) first hyperparameter to set.
+
+** Stochastic gradient descent
+
+   \[L(W) = \frac{1}{N} \sum_i L_i(x_i, y_i, W) + \lambda R(W) \]
+
+   \[\Delta_W L(W) = \frac{1}{N} \sum_i \Delta_W L_i(x_i, y_i, W) + \lambda \Delta_W R(W) \]
+
+   It's too expensive if we use all the training data to compute the
+   gradient.  We can approximate the gradient by use only a little
+   fraction of training data.
+
+** Image features
+
+   We extract the image features and concatenate these features into a
+   single feature vector.  We feed this feature vector into our linear
+   classifier intead the raw pixels.  Through this process, the
+   feature data may also be linearly separable.
+
+   e.g. color histogram, histogram of oriented gradients, bag of words,
+
+   
