@@ -7,10 +7,10 @@
    $output score = f(x, W)$, $x$ is the image input
    and $W$ is the parameters or weights.
 
-   We summarize $x$ into $W$.  When we do tests, we don't need $x$
-   anymore. Much faster.
+   We summarize $x$' feature into $W$.  When we do tests, we don't
+   need $x$ anymore. Much faster.
 
-   The problem is how to design the $f$ ? The easy one: Linear Classifier
+   The problem is how to design the $f$ ? The easy one: *Linear Classifier*
 
 ** Linear Classifier
 
@@ -153,3 +153,59 @@
 
      ???
      
+* Notes
+
+  The classification has 2 major parts: *score function*, *loss
+  function*.  The score function maps raw data to a predicted class
+  score.  The loss function quantifies the agreement between predicted
+  scores and the ground truth labels.
+
+  We cast the problem into to an optimization problem in which we
+  minimize loss function with respect to the parameters of score
+  function.
+
+  template matching: treat inner product as a kind of distance as
+  L1/L2 in nearest neighbour classification.
+
+  \[f(x_i, W, b) \text{ rewite to } f(x_i, W)\] 
+  
+  We can extend $W = [W
+  b]$, and extend $x$ by one additional dimension that always holds
+  constant 1.
+
+  Image preprocessing: center data and normalize to [-1, 1].
+
+  loss function, cost function, objective.
+
+  multi-class SVM classifier, hinge loss, max-margin loss $max(0, -)$
+
+  squared hinge loss $max(0, -)^2$
+
+  Use regularization to remove $W$ 's ambiguity. Penalizing large
+  weights tends to increase generalization.
+
+  Hinge loss margin $\Delta$ and regularization strength $\lambda$ are
+  2 different hyperparameters, but we always set $\Delta = 1$.  The
+  reason is, if we find a $W$ that has a 0 loss with a specific hinge
+  loss function ($\Delta$), we can also get a 0 loss by multiply $W$,
+  $\Delta$ by a same positive real number.  So it's meaningless to set
+  $\Delta$ by cross-validation.  The real trade off is how large we
+  allow our weights to grow(through regularization strength).
+
+  Softmax classifier, cross-entropy loss, softmax function make
+  cross-entropy loss possible.
+
+  Pratical issues: numeric stability. $\text{softmax} =
+  \frac{e^{f_y_i}}{\sum_j e^{f_j}}$, $e^{f_y_i}$ and $\sum_j e^{f_j}$
+  can be very large, it will imply numeric unstable problems.  So it's
+  important to use a normalization trick as:\[\frac{C e^{f_y_i}}{C
+  \sum_j e^{f_j}} = \frac{e^{f_y_i + logC}}{\sum_j e^{f_j + logC}}\],
+  we let $logC = - max(f_j)$.  In other word, we should subtract all
+  elements in $f$ by the largest element in $f$ so that the largest
+  value in $f$ is 0.
+  
+  In the softmax classifer, When we interpret the probabilities
+  transformed by the softmax function, we treat the "probabilities" as
+  confidence in the ordering of scores, not absolute value.
+
+  

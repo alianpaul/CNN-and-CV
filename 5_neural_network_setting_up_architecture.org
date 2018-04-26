@@ -1,0 +1,141 @@
+#+STARTUP: latexpreview
+
+Notes
+
+* Quick Intro
+
+  A 3 layer neural network:
+
+  \[s = W_3max(0, W_2 max(0, W_1 x))\]
+  
+  The non-linearity($max(0, -)$) is where we get the wiggle.  If we
+  left it out, it's just a linear classifier we see before.
+
+  The size of the intermediate hidden vector is hyperparameter.
+
+* Modeling one neuron
+
+  Activation function applies the non-linearity.
+
+** Single neuron as a linear classifier
+
+   We can train a single neuron into a linear classifer(Binary Softmax
+   Classifer or Binary SVM classifier).
+
+   - Binary Softmax Classifier: 
+
+     If we choose activation function to be sigmoid function $\sigma$,
+     the output of the neuron is between 0 and 1.  We can interpret it
+     as the probability of output = 1.  Then we can apply the cross
+     entropy loss on the output.  By optimize this loss we can get a
+     binary softmax classifier.
+     
+   - Binary SVM Classifier:
+
+     We can also apply the max-margin hinge loss.  By optimize this
+     loss we can get a binary SVM classifier.
+
+   Single neuron can be trained into a binary classifier.
+
+** Commonly used activation functions
+   
+   - Sigmoid
+     
+     Cons:
+     
+     Sigmoid saturate and kill gradients.  When sigmoids saturate, the
+     local gradient is almost 0.  So when the weights are too large,
+     sigmoids will saturate and the network will barely learn.
+
+     Output is not 0 centered.  So in the later neuron, the local
+     weights' gradients are always > 0. *This will introduce zig-zag
+     dynamics in the gradient update??*
+     
+   - Tanh
+
+     [-1, 1], 0 centered, but may saturate and kill gradients.
+
+     Tanh neuron is a scaled sigmoid neuron.
+
+   - ReLU
+
+     The Rectified Linear Unit. $f(x) = max(0, x)$
+
+     Pros:
+
+     Greatly accelerate the convergence of the gradient.
+
+     Easy to implement
+
+     Cons:
+
+     Fragile during training and can die.  The gradient is too big, we
+     update a neuron's weights in such a way that the neuron will
+     never activate on any data point again.  The output forever be 0.
+     So in backpropagation process, the gradient of weights will
+     always be 0(max gate route the gradient to "0" input, but "0" is
+     not a weight variable).  To avoid this problem, we need to set
+     the learning rate carefully.
+
+   - Leaky ReLU
+
+     Try to avoid the "dying ReLU" problem.
+     
+   - Maxout
+     
+     $max(w_1^Tx + b_1, w_2^Tx + b_2)$
+     no dying ReLU problem, but the parameters doubled.
+     
+   It's rare to mix and match different type of neurons.  ReLU > leaky
+   ReLU > Maxout > Sigmoid.
+* Neural Network Architectures
+** Layer-wise organization
+   
+   Stack of fully connected layer.
+
+   N-layer neural network, input layer doesn't count.
+
+   *Logistic regression* or SVMs are single layer network(only have
+   the output layer).
+
+   Output layers usually dont have activation function.  It's output
+   represents classification score.
+
+** Example feed-forward computation 
+
+   Repeated matrix multiplications interwoven with activation
+   function.
+
+   One primary reason that the NN are organized into layers is that
+   this structure make it very efficient and simple to evaluate NN
+   using matrix vector operations.
+
+** Representational power
+
+   Fully connected NN, family of functions parameterized by the
+   weights of the network.
+
+   *Are there functions that can not be modeled by the NN?*
+
+   The NN can approximate any continious function.
+
+   Empirical observation: The deeper the better in practice.
+
+   CNN, the depth is an extremely important component.
+
+** Setting number of layers and their sizes
+
+   The capacity of the network: the space of representable functions.
+   Larger NN can represent complex functions.
+
+   Large NN may have overfitting problem.  We use other ways to
+   prevent overfitting problem(regularization, drop out, input noise)
+   instead of decrease the size of the NN.
+
+   The subtle reason behind this is that smaller networks are harder
+   to train with local methods such as Gradient Descent.  The number
+   of local minima is few but the variance of these minima is big.
+   Large NN minima equally as good.
+
+   
+

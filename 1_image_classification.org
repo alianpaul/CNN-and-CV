@@ -1,60 +1,66 @@
 #+STARTUP: latexpreview
 
-* Nearest Neighbour Classifier
-** How to compare two images?
+* Intro to Image Classification
+  CV中的常见问题，许多CV问题，如object detection，image segmentation等，
+  都可以被划归为image classification问题。
 
-   Distance Metric.
+** Challenges of image classification：
+   - View point variation
+   - Scale variation
+   - Deformation
+   - Occlusion
+   - Illumination condition
+   - Background clutter
+   - Intra class variation
 
-   L1 Distance(Manhatton distance): $d_1(I_1, I_2) = \sum_p | I_1^p - I_2^p |$
+** Data driven approach
+   提供非常多的数据事例(many examples of each class)，并使用一个
+   learning algorithm来学习这些examples。
 
-   Training process just memorize the data. Predicting process just go
-   through the data and find the minist L1 distance image.
-
-** How long it takes in the 2 processes?
-
-   Training: $O(1)$
-   Predicting: $O(N)$
-
-   We want a fast predicting process and dont care how long the
-   training process takes.
-
-** Descison region of the nearest neighbour classifier.
-
-   Region has faults.  e.g. Islands or fingers in a region.
-   Improvement: K-nearest Neighbour
-
-** K-nearest Neighbour
-   kNN
-
-   Majority vote from K closest points
-
-   Region can be smoothed through votes.
-
-** L2 distance(Euclidean distance)
-
-   L2 distance(Euclidean distance): $d_2(I_1, I_2) = \sqrt{\sum_p (I_1^p - I_2^p)^2}$
-
-   What is happening if we choose different distance metric?
-
-   L1 depends on the coordinate system we choose.  L2 does not. 
-
-** Hyperparameters
-
-   Parameters not learned from training data.  We set these rather
-   than learn. e.g. K, distance metrics.  These depend on the problem
-   and data.  Try different hyperparameters and see what works best. 
-
-   We separate the data into 3 sets: *Training data*, *Validation data*,
-   *Test data*.  We use validation data to choose the best
-   hyperparameter setting.  At last we use test data to test our
-   model once at the very end.
-
-   *Cross-validation*: useful for small datasets, but not used too
-   frequently in deep learning.
-
-** K-nearest neighbour on images never used
-   - Distance metrics on pixels are not informative.
-   - The curse of Dimensionality.  We want the points in the space to
-     be dense, but the points increase exponentially with the
-     dimension.  We will never cover the full space.
+** Image classification pipeline
+   - Input: training set, 对于image classification这个问题, training
+     set就是a set of N images, each labeled with one of the K
+     different classes.
+   - Learning: 学习每一个Class应该如何区分，training a
+     classifier/learning a model
+   - Evaluation: use a new set of images that has never seen before to
+     test the classifier.  Test if the prediction matches the ground truth.
      
+* Nearest Neighbour Classifier
+  images: 32*32*3 training set size:50,000, test set size: 10,000 
+
+  我们选择与test image最近似的image的label作为test image的label。
+
+  我们将image表示为一个向量，用*L1 distance*描述两图片之间的相似性
+
+  \[d_1(I_1, I_2) = \sum_p | I_1^p - I_2^p |\]
+  
+  我们也可以选择其它distance来描述两image之间的相似性，例如*L2 distance*
+
+  $d_2(I_1, I_2) = \sqrt{\sum_p (I_1^p - I_2^p)^2}$
+  
+  在实际应用中，我们不需要$\sqrt$ ，因为$\sqrt$是单调递增的函数(monotonic function)。
+
+  - L1 vs L2: L2 对one big difference的容忍度更低，L2 更prefer many
+    small differences。
+  - The *p norm* of a vector: $\|x\|_p = (|x_1|^p + |x_2|^p + \cdots + |x_n|^p)^{\frac{1}{p}}$
+
+  *K-Nearest Neighbour Classifier*: find the k closest images and vote
+  out the label of the test image.
+
+* Validation Sets, Cross-validation, Hyperparameter Tuning
+  不要使用test set来tune hyperparameters，we may overfit to the test
+  data.  Evaluate on the test set only a single time, at the very
+  end. 所以我们将training set再做一次分割，分出一部分数据作为
+  validation set，用于调整hyperparameter。
+  
+  *cross validation*: used when training data is small.
+  
+* Pros/Cons of Nearest Neighbour
+  - Distance metrics on pixels are not informative.
+  - The curse of Dimensionality.  We want the points in the space to
+    be dense, but the points increase exponentially with the
+    dimension.  We will never cover the full space.
+  - We want test complexity to be $O(1)$, not $O(N)$ in the kNN.
+
+* Summary

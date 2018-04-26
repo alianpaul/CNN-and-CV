@@ -17,8 +17,9 @@
 
     Naively, for each element(direction) of gradient, we increase a
     little bit and get the function increase.  We do this for each
-    direction and get the gradient vector.  This is the *numeric gradient*.
-    We may also use *analytic gradient* by getting the precise expression.
+    direction and get the gradient vector.  This is the *numeric
+    gradient*(finite differene approximation) We may also use
+    *analytic gradient* by getting the precise expression.
 
 ** Gradient check
 
@@ -53,3 +54,8 @@
    e.g. color histogram, histogram of oriented gradients, bag of words,
 
    
+
+* Notes
+
+  center difference formula:
+  

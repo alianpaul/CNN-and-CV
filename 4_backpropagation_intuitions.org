@@ -1,0 +1,122 @@
+#+STARTUP: latexpreview
+
+* Lecture
+
+  - How to compute the analytic gradient for arbitrarily complex functions?
+
+   *Computational graph*: Represents the computation we go through,
+    each node is an operation.  Once we can represent the function
+    using the computational graph, we can use backpropagation to
+    compute the gradient, which is a recursive application of the
+    chain rule.
+
+  - Chain rule
+
+    \[\frac{\partial f}{\partial x} = \frac{\partial f}{\partial q} \cdot \frac{\partial q}{\partial x}\]
+
+  - As long as we can calculate the local gradient, we can group  several nodes together as a single node.
+
+    Sigmoid node.
+
+    Add gate: gradient distributor.
+
+    Max gate: gradient router.
+
+    Mul gate: gradient switcher.
+
+    Gradients for vectorized code.
+
+  - Now the partial derivative is Jacobian Matrix. $\frac{\partial
+    f}{\partial x}$ needs to compute each element of $f$ according to
+    each element of $x$.
+
+  - A vectorized example.
+
+    \[f(x, W) = \| W \cdot x \|^2 = \sum_{i = 1} ^{n} (W \cdot x)_i^{2
+}\]
+
+    2 operations: matrix mul, L2 norm.
+
+    \[
+    q = W \cdot x = 
+    \begin{bmatrix} 
+    W_{1,1} & W_{1, 2} & W_{1, 3} \cdots & W_{1, n} \\
+    W_{2,1} & W_{2, 2} & W_{2, 3} \cdots & W_{2, n} \\
+    \vdots  & \vdots   & \vdots   \ddots & \vdots   \\
+    W_{n,1} & W_{n, 2} & W_{n, 3} \cdots & W_{n, n}
+    \end{bmatrix}
+    \cdot
+    \begin{bmatrix}
+    x_1 \\
+    x_2 \\
+    \vdots \\
+    x_n
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+    W_{1,1}x_1 + W_{1,2}x_2 + \cdots + W_{1,n}x_n \\
+    W_{2,1}x_1 + W_{2,2}x_2 + \cdots + W_{2,n}x_n \\
+    \vdots \\
+    W_{n,1}x_1 + W_{n,2}x_2 + \cdots + W_{n,n}x_{n}
+    \end{bmatrix}
+    \]
+    
+    \[q_k = W_{k,1}x_1 + W_{k,2}x_2 + \cdots W_{k,n}x_n \]
+
+    \[f = q_1^2 + q_2^{2} + \cdots + q_n^2 \]
+
+    \[\frac{\partial f}{\partial q_k} = 2q_k\]
+
+    \[\frac{\partial q_{k}}{\partial W_{i,j}} = 
+    \begin{cases}
+    x_j & \text{if } k = i \\
+    0   & \text{otherwise}
+    \end{cases}
+    =
+    1_{k=i}x_j
+    \]
+
+    \[
+    \frac{\partial f}{\partial W_{i,j}} = 
+    \sum_k \frac{\partial f}{\partial q_k} \frac{\partial q_k}{\partial W_{i,j}} = 
+    \sum_k 2q_k 1_{k=i}x_j = 
+    2q_ix_j
+    \]
+
+    Always check: The gradient with respect to a variable should have
+    the same shape with the variable.
+
+    Caffe layer: complex computational nodes. 
+
+* Notes
+  - gradient of $f(x, y) = max(x, y)$.
+
+    \[\nabla f = [\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}]\]
+
+    \[\frac{\partial f}{\partial x} = 1(x >= y)\]
+
+    \[\frac{\partial f}{\partial y} = 1(y >= x)\]
+
+    The gradient is 1 on the largest input element, 0 on others.
+
+  - Every gate in the computational graph gets some inputs and can right
+    away compute 2 things: *output value* and *local gradient* with
+    respect to output value.
+
+  - Any kind of differentiable function can act like a gate.  We can
+    group multiple gates into single gate or decompose a function into
+    multiple gates.
+
+  - Break down the foreward pass into stages that are easily
+    backpropped through.
+
+  - Cache forward pass variables so that they can be used in the
+    backpropagation.
+
+  - Gradient add up at forks according to *multivariable chain rule*.
+
+  - The multiply gate's local gradient is the switched input.
+    e.g. $w^Tx$, the larger the inputs $x$ are, the larger the
+    gradients of weight $w$ are.  If the weights' gradient is too big,
+    we need to decrease the learning rate $\eta$.  So preprocessing
+    the input data matters a lot.
